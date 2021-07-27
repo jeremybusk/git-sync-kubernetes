@@ -16,8 +16,12 @@ if [ -z ${INTERVAL} ]; then
   INTERVAL=600
 fi
 
-if [ -z ${MAIN} ]; then
- BRANCH=main
+if [ -n ${BRANCH} ]; then
+ BRANCHCMD="--branch $BRANCH"
+fi
+
+if [ -n ${SINGLEBRANCH} ]; then
+ SINGLEBRANCHCMD="--single-branch"
 fi
 
 authURL(){
@@ -52,12 +56,13 @@ cloneOrPull(){
   ec=$?
   set -e
   ts=$(date +"%Y-%m-%d %H:%M:%S")
+  DISPLAYREPO=$(echo $REPO | cut -d"/" -f4-)
   if [[ $ec -eq 0 ]]; then
-    echo "$ts Pulling $REPO to $DIR"
+    echo "$ts Pulling $DISPLAYREPO to $DIR"
     git pull $QUIET
   else
-    echo "$ts Cloning $REPO to $DIR"
-    git clone $QUIET --single-branch $REPO .
+    echo "$ts Cloning $DISPLAYREPO $BRANCH to $DIR"
+    git clone $QUIET ${SINGLEBRANCHCMD} ${BRANCHCMD} $REPO .
   fi
   cd
 }
@@ -66,7 +71,6 @@ cloneOrPull(){
 chmodDir(){
   if [ -n "${CHMOD}" ]; then
     git stash
-    # echo ${CHMOD}
     find . -type f | grep -v $CHMOD_EXCLUDE | xargs ${CHMOD}
   fi
 }
