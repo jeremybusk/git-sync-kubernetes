@@ -18,6 +18,8 @@ fi
 
 if [ -n ${BRANCH} ]; then
  BRANCHCMD="--branch $BRANCH"
+else
+  BRANCHCMD="--branch main"
 fi
 
 if [ -n ${SINGLEBRANCH} ]; then
